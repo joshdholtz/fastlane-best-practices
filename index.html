@@ -81,10 +81,7 @@
                     <h4><strong>Lead maintainer</strong> of <em>fastlane</em> since March 2018</h4>
                   </li>
                   <li>
-                    <h4>Add features, manage issues, decide direction/focus</h4>
-                  </li>
-                  <li>
-                    <h4>Currently spending to 20 to 30 hours a week maintaing <em>fastlane</em></h4>
+                    <h4>Add features, manage issues, merge PRs, make releases</h4>
                   </li>
                 </ul>
               </li>
@@ -212,14 +209,9 @@
         <section class="bg-apple slide-center">
           <div class="wrap">
             <h1>1. Install with <code>bundler</code></h1>
-            <h4>Create Gemfile</h4>
-            <pre class="language-bash"><code data-pygments="ignore">$ bundle init</code></pre>
-            <h4>Edit Gemfile</h4>
-            <pre class="language-ruby"><code data-pygments="ignore">source "https://rubygems.org"
+            <ul class="slide-list">
 
-gem "fastlane"</code></pre>
-            <h4>Install gems</h4>
-            <pre class="language-bash"><code data-pygments="ignore">$ bundle install</code></pre>
+            </ul>
             <ul class="slide-list">
               <li>Keep <em>fastlane</em> and its dependencies consistant</li>
               <li>
@@ -240,6 +232,21 @@ gem "fastlane"</code></pre>
                 </ul>
               </li>
             </ul>
+          </div>
+        </section>
+        <section class="bg-apple slide-center">
+          <div class="wrap">
+            <h1>1. Install with <code>bundler</code> cont'd</h1>
+            <h4>Create Gemfile</h4>
+            <pre class="language-bash"><code data-pygments="ignore">$ bundle init</code></pre>
+            <h4>Edit Gemfile</h4>
+            <pre class="language-ruby"><code data-pygments="ignore">source "https://rubygems.org"
+
+gem "fastlane"</code></pre>
+            <h4>Install gems</h4>
+            <pre class="language-bash"><code data-pygments="ignore">$ bundle install</code></pre>
+            <h4>Execute <em>fastlane</em></i></h4>
+            <pre class="language-bash"><code data-pygments="ignore">$ bundle exec fastlane <lane></code></pre>
           </div>
         </section>
         <section class="bg-apple slide-center">
@@ -286,21 +293,45 @@ platform :android do
 end</code></pre>
           </div>
         </section>
+
+        <!-- 3. Lane Options -->
         <section class="bg-apple slide-center">
-            <div class="wrap">
-              <h1>3. Lane Options and <code>UI</code></h1>
-              <ul class="slide-list">
-                <li>Pass options to a lane: <code>fastlane &lt;lane&gt; opt1:val1 opt2:val2</code></li>
-                <li>
-                  Get user input with <code>UI</code> class
-                  <ul>
-                    <li>
-                      <a href="https://docs.fastlane.tools/advanced/#interacting-with-the-user" target="_blank">https://docs.fastlane.tools/advanced/#interacting-with-the-user</a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-              <pre class="language-ruby"><code data-pygments="ignore">lane :bump do |options|
+          <div class="wrap">
+            <h1>3. Lane Options and <code>UI</code></h1>
+            <ul class="slide-list">
+              <li>Pass options to a lane: <code>fastlane &lt;lane&gt; opt1:val1 opt2:val2</code></li>
+            </ul>
+            <pre class="language-ruby"><code data-pygments="ignore"># fastlane bump version:"1.0" build_number:"123"
+lane :bump do |options|
+  version = options[:version]
+  build_number = options[:build_number]
+
+  # Update plist with new version and build number
+  update_info_plist(
+    xcodeproj: 'Test.xcodeproj',
+    plist_path: 'Test/Info.plist',
+    block: proc do |plist|
+      plist["CFBundleShortVersionString"] = version
+      plist["CFBundleVersion"] = build_number
+    end
+  )
+end</code></pre>
+          </div>
+        </section>
+        <section class="bg-apple slide-center">
+          <div class="wrap">
+            <h1>3. Lane Options and <code>UI</code> cont'd</h1>
+            <ul class="slide-list">
+              <li>
+                Get user input with <code>UI</code> class
+                <ul>
+                  <li>
+                    <a href="https://docs.fastlane.tools/advanced/#interacting-with-the-user" target="_blank">https://docs.fastlane.tools/advanced/#interacting-with-the-user</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <pre class="language-ruby"><code data-pygments="ignore">lane :bump do |options|
   # Prompt version number
   version = nil
   loop do
@@ -322,8 +353,10 @@ end</code></pre>
     end
   )
 end</code></pre>
-            </div>
-          </section>
+          </div>
+        </section>
+
+
         <section class="bg-apple slide-center">
           <div class="wrap">
             <h1>4. Lane Description</h1>
@@ -346,6 +379,8 @@ end</code></pre>
             <img style="height: 50%;" src="./static/images/example_markdown.png"/>
           </div>
         </section>
+
+        <!-- 5. Environment Variables -->
         <section class="bg-apple slide-center">
           <div class="wrap">
             <h1>5. Environment Variables</h1>
@@ -354,15 +389,11 @@ end</code></pre>
             <pre class="language-ruby"><code data-pygments="ignore"># fastlane/.env
 GYM_PROJECT=Example.xcodeproj
 GYM_SCHEME=development</code></pre>
-
-            <h4>Put <code>--env</code> specific values in <code>.env.&lt;environment&gt;</code></h4>
-            <ul>
-              These get loaded when <code>fastlane &lt;lane&gt; --env &lt;environment&gt;</code> gets run
-            </ul>
-            <pre class="language-ruby"><code data-pygments="ignore"># fastlane/.env.staging
-GYM_SCHEME=staging</code></pre>
-            <pre class="language-ruby"><code data-pygments="ignore"># fastlane/.env.production
-GYM_SCHEME=production</code></pre>
+          </div>
+        </section>
+        <section class="bg-apple slide-center">
+          <div class="wrap">
+            <h1>5. Environment Variables cont'd</h1>
             
             <h4>Load secret values from <code>.env.secret</code></h4>
             <ul>
@@ -373,6 +404,22 @@ GYM_SCHEME=production</code></pre>
 FASTLANE_PASSWORD=shhhhhh</code></pre>
             <pre class="language-ruby"><code data-pygments="ignore">fastlane_require "dotenv"
 Dotenv.load ".env.secret"</code></pre>
+          </div>
+        </section>
+        <section class="bg-apple slide-center">
+          <div class="wrap">
+            <h1>5. Environment Variables cont'd</h1>
+
+            <h4>Put <code>--env</code> specific values in <code>.env.&lt;environment&gt;</code></h4>
+            <ul>
+              These get loaded when <code>fastlane &lt;lane&gt; --env &lt;environment&gt;</code> gets run
+            </ul>
+            <pre class="language-ruby"><code data-pygments="ignore"># fastlane/.env.development
+GYM_SCHEME=development</code></pre>
+            <pre class="language-ruby"><code data-pygments="ignore"># fastlane/.env.staging
+GYM_SCHEME=staging</code></pre>
+            <pre class="language-ruby"><code data-pygments="ignore"># fastlane/.env.production
+GYM_SCHEME=production</code></pre>
           </div>
         </section>
         <section class="bg-apple slide-center">
@@ -390,6 +437,8 @@ end
 </code></pre>
           </div>
         </section>
+
+        <!-- 6. fastlane documentation -->
         <section class="bg-apple slide-center">
           <div class="wrap">
             <h1>6. <em>fastlane</em> Documentation</h1>
@@ -424,6 +473,8 @@ end
             </ul>
           </div>
         </section>
+
+        <!-- 7. Separate Apple ID -->
         <section class="bg-apple slide-center">
           <div class="wrap">
             <h1>7. Separate Apple ID</h1>
@@ -431,17 +482,20 @@ end
               Instead of <code>your.name@example.com</code>... Use <code>fastlane@example.com</code>
             </h3>
             <ul>
+              <li>Get around force two-factor auth on "Account Holders" accounts</li>
               <li>Prevents from having to use a personal email/password</li>
               <li>Especially if two-step or two-factor auth is enabled</li>
               <li>Can revoke access at anytime (great for CI)</li>
             </ul>
           </div>
         </section>
+
+        <!-- 8. Match or sigh -->
         <section class="bg-apple slide-center">
           <div class="wrap">
             <h1>8. Use <code>match</code> or <code>sigh</code> before <code>gym</code></h1>
             <ul>
-              <li><em>Xcode 9</em> requires that an <code>-exportOptionsPlist</code> be passed to the <code>xcodebuild</code> command that <em>gym</em> generates</li>
+              <li><em>Xcode 9 (and up)</em> requires that an <code>-exportOptionsPlist</code> be passed to the <code>xcodebuild</code> command that <em>gym</em> generates</li>
               <li>This <code>exportOptionsPlist</code> is required to have a key for <code>provisioningProfiles</code></li>
               <li>This can be manually passed into <em>gym</em> through <code>export_options</code> like the following:</li>
 
@@ -465,7 +519,8 @@ end</code></pre>
             <h1>8. Use <code>match</code> or <code>sigh</code> before <code>gym</code> cont'd</h1>
             <pre class="language-ruby"><code data-pygments="ignore">lane :build do
     sigh(
-      app_identifier: "com.joshholtz.FastlaneDemo"
+      app_identifier: "com.joshholtz.FastlaneDemo",
+      development: false
     )
     gym()
 end</code></pre>
@@ -521,6 +576,42 @@ end</code></pre>
   json = JSON.parse(resp.body)
   people = json["results"]
   random_person = people.sample
+  
+  update_info_plist(
+    xcodeproj: 'Test.xcodeproj',
+    plist_path: 'Test/Info.plist',
+    block: proc do |plist|
+      plist["CFBundleDisplayName"] = random_person['name']
+    end
+  )
+
+  sigh()
+  gym()
+end</code></pre>
+          </div>
+        </section>
+        <section class="bg-apple slide-center">
+          <div class="wrap">
+            <h1>9. Keep Lanes Simple - Custom Action cont'd</h1>
+            <ul>
+              <li>
+                Now replace custom logic in the lane with new action name
+              </li>
+              <li>
+                The new action code is easier to maintain and Test
+              </li>
+              <li>
+                The new acttion has documentation that other developers can reference
+              </li>
+              <li>
+                The action can easily be reused
+              </li>
+              <li>
+                The <em>faslane</em> output now shows when new action is being called
+              </li>
+            </ul>
+            <pre class="language-ruby"><code data-pygments="ignore">lane :star_wars do
+  random_person = star_wars_api(route: "/people/").sample
   
   update_info_plist(
     xcodeproj: 'Test.xcodeproj',
@@ -619,42 +710,6 @@ end</code></pre>
 end</code></pre>
           </div>
         </section>
-        <section class="bg-apple slide-center">
-          <div class="wrap">
-            <h1>9. Keep Lanes Simple - Custom Action cont'd</h1>
-            <ul>
-              <li>
-                Now replace custom logic in the lane with new action name
-              </li>
-              <li>
-                The new action code is easier to maintain and Test
-              </li>
-              <li>
-                The new acttion has documentation that other developers can reference
-              </li>
-              <li>
-                The action can easily be reused
-              </li>
-              <li>
-                The <em>faslane</em> output now shows when new action is being called
-              </li>
-            </ul>
-            <pre class="language-ruby"><code data-pygments="ignore">lane :star_wars do
-  random_person = star_wars_api(route: "/people/").sample
-  
-  update_info_plist(
-    xcodeproj: 'Test.xcodeproj',
-    plist_path: 'Test/Info.plist',
-    block: proc do |plist|
-      plist["CFBundleDisplayName"] = random_person['name']
-    end
-  )
-
-  sigh()
-  gym()
-end</code></pre>
-          </div>
-        </section>
 
         <section class="bg-apple slide-center">
           <div class="wrap">
@@ -676,8 +731,8 @@ end</code></pre>
         <section class="bg-apple aligncenter">
             <h1 class="text-emoji zoomIn">😎</h1>
             <h3><strong>Thank you!</strong></h2>
-            <p><a href="https://twitter.com/joshdholtz" title="@WebSlides on Twitter">@joshdholtz</a></p>
-            <h4>Now time for Q&amp;A</h4>
+            <h4><a href="https://twitter.com/joshdholtz" title="@WebSlides on Twitter">@joshdholtz</a></h4>
+            <h5><a href="http://joshholtz.com/fastlane-best-practices">joshholtz.com/fastlane-best-practices</a></h5>
           </section>
 
       </article>
